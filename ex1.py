@@ -264,10 +264,10 @@ class sparseMerkleTree:
         digitArray = list(digitStr)
         #check size
         if(len(digitArray) != 256):
-            raise Exception("")
+            raise ValueError('oops!')
         #check digit
         if((digitArray.count('0')+digitArray.count('1')) != len(digitArray)):
-           raise Exception("")
+           raise ValueError('oops!')
         self.MarkLeafRecursion(self.root ,digitArray)
     # update hash after add
     def MarkLeafHashUpdate(self , node):
@@ -309,7 +309,7 @@ class sparseMerkleTree:
                     node.right = NodeMarkel(None,None,None,node,node.level-1)
                 self.MarkLeafRecursion(node.right ,digitArray)
             else:
-                raise Exception("")
+                raise ValueError('oops!')
     #get data of root
     def dataOfRoot(self):
         return self.root.data
@@ -320,9 +320,9 @@ class sparseMerkleTree:
         #convert to list
         digitArray = list(digitStr)
         if(len(digitArray) != 256):
-            raise Exception("")
+            raise ValueError('oops!')
         if((digitArray.count('0')+digitArray.count('1')) != len(digitArray)):
-            raise Exception("")
+            raise ValueError('oops!')
         if(self.root.data  == self.hashBlankVertices[256]):
             array.append(self.dataOfRoot())
             array.append(self.dataOfRoot())
@@ -349,6 +349,8 @@ class sparseMerkleTree:
                     arrayOfInclusion.append(node.right.data)
                 #dont nead continue
                 if(node.left == None):
+                    if(node.level == 1):
+                        return
                     arrayOfInclusion.append(self.hashBlankVertices[node.level-1])
                     return
                 else:
@@ -362,14 +364,15 @@ class sparseMerkleTree:
                 else:
                     arrayOfInclusion.append(node.left.data)
                 if(node.right == None):
-                    
+                    if(node.level == 1):
+                        return
                     arrayOfInclusion.append(self.hashBlankVertices[node.level-1])
                     return
                 else:
                     self.createProofOfInclusionRecurse(node.right ,digitArray,arrayOfInclusion)
                     return
             else:
-                raise Exception("")
+                raise ValueError('oops!')
     #check proof of inclusion of SMT
     def checkProofSMT(self , digest , classification , proof):
         arrayProof = proof.split(" ")
@@ -378,9 +381,9 @@ class sparseMerkleTree:
         digitArray = list(digest)
         #checkes
         if(len(digitArray) != 256):
-            raise Exception("")
+            raise ValueError('oops!')
         if((digitArray.count('0')+digitArray.count('1')) != len(digitArray)):
-            raise Exception("")
+            raise ValueError('oops!')
         if(arrayProof[0] != self.root.data):
             return False
         del arrayProof[0]
@@ -482,8 +485,11 @@ def main():
                 T.add(x[1])  
             #input 2 print the data of root Tree merkle
             elif(x[0] == '2'):
+            
                 if(T.root != None):
                     print(T.root.data)
+                else:
+                    raise ValueError('oops!')         
             #input 3 printcreate proof of inclusion
             elif(x[0] == '3'):
                 
@@ -589,7 +595,8 @@ def main():
                 print(SMT.checkProofSMT(digest,classification,proof))
                 
           
-        except Exception as exception:
+        #except Exception as exception:
+        except ValueError:
                     print() 
 main()
 
